@@ -4,5 +4,7 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"i18next.i18nPaths": "/Users/andrew/www/delugian/src/i18n"
+	}
 }
