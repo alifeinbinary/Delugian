@@ -19,6 +19,7 @@ serde_json = "1.0"
 midir = "0.9.1"
 usb = "0.2.2"
 tauri-plugin-store = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }
+tauri-plugin-midi = "0.0.0"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem
