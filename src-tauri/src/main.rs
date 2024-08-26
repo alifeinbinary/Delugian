@@ -47,20 +47,23 @@ fn open_midi_connection(
     window: Window<Wry>,
     input_idx: usize,
 ) {
-    let handle = Arc::new(window).clone();
-    let midi_in = MidiInput::new("delugian-input");
-    let midi_out = MidiOutput::new("delugian-output");
+    let handle: Arc<Window> = Arc::new(window).clone();
+    let midi_in: Result<MidiInput, midir::InitError> = MidiInput::new("delugian-input");
+    let midi_out: Result<MidiOutput, midir::InitError> = MidiOutput::new("delugian-output");
     match midi_in {
         Ok(mut midi_in) => {
             midi_in.ignore(Ignore::None);
-            let midi_in_ports = midi_in.ports();
-            let port = midi_in_ports.get(input_idx);
+            let midi_in_ports: Vec<midir::MidiInputPort> = midi_in.ports();
+            let port: Option<&midir::MidiInputPort> = midi_in_ports.get(input_idx);
             match port {
                 Some(port) => {
-                    let midi_in_conn = midi_in.connect(
+                    let midi_in_conn: Result<
+                        MidiInputConnection<()>,
+                        midir::ConnectError<MidiInput>,
+                    > = midi_in.connect(
                         port,
                         "midir",
-                        move |_, message, _| {
+                        move |_, message: &[u8], _| {
                             handle
                                 .emit_all(
                                     "midi_message",
@@ -93,11 +96,12 @@ fn open_midi_connection(
     }
     match midi_out {
         Ok(midi_out) => {
-            let midi_out_ports = midi_out.ports();
-            let port = midi_out_ports.get(input_idx);
+            let midi_out_ports: Vec<midir::MidiOutputPort> = midi_out.ports();
+            let port: Option<&midir::MidiOutputPort> = midi_out_ports.get(input_idx);
             match port {
                 Some(port) => {
-                    let midi_out_conn = midi_out.connect(port, "midir").unwrap();
+                    let midi_out_conn: MidiOutputConnection =
+                        midi_out.connect(port, "midir").unwrap();
                     midi_state.output.lock().unwrap().replace(midi_out_conn);
                 }
                 None => {
