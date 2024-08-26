@@ -28,7 +28,11 @@
         "icons/icon.ico"
       ],
       "identifier": "com.tauri.dev",
-      "targets": "all"
+      "targets": "all",
+      "category": "Music, Utility",
+      "macOS": {
+        "minimumSystemVersion": "10.11"
+      }
     },
     "security": {
       "csp": null
