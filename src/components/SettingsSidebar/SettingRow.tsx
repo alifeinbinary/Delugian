@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import Select from 'react-select'
 import UncheckedIcon from 'remixicon-react/CheckboxBlankCircleLineIcon'
 import CheckedIcon from 'remixicon-react/CheckboxCircleFillIcon'
-import { InstrumentName } from 'soundfont-player'
 import styled from 'styled-components'
 import { MidiDevice, PTSettingType } from '../../utils'
 import {
@@ -93,6 +92,7 @@ const SettingRow = ({ setting, value }: SettingRowProps) => {
               console.error('There was an error connecting to MIDI', e)
             }
           }}
+          className='text-black'
         />
       </SettingRowContainer>
     )
