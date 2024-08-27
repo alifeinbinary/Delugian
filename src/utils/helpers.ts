@@ -1,4 +1,4 @@
-import { MidiNumbers } from 'react-piano'
+import { MidiNumbers } from "react-piano";
 
 /**
  * Converts a given midi number to it's corresponding letter form. (ex. 48 = C)
@@ -8,5 +8,5 @@ import { MidiNumbers } from 'react-piano'
 export const midiNumberToNote = (midiNumber: number): string => {
   return MidiNumbers.getAttributes(midiNumber)
     .note.toLowerCase()
-    .replace(/[0-9]/, '')
-}
+    .replace(/[0-9]/, "");
+};
