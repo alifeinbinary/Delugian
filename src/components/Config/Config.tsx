@@ -1,4 +1,4 @@
-import { invoke } from '@tauri-apps/api'
+import { invoke } from '@tauri-apps/api/tauri'
 import { listen, UnlistenFn } from '@tauri-apps/api/event'
 import {
   useCallback,
@@ -14,7 +14,7 @@ import {
 } from '../../utils'
 import { KVContext } from '../KVProvider'
 import { MainContext } from '../MainProvider'
-import ConfigHeader from './ConfigHeader'
+import Navbar from '../Main/Navbar'
 
 const ConfigPage = styled.div`
   height: 100%;
@@ -63,13 +63,15 @@ const Config = () => {
 
     listen('midi_message', (event) => {
       const payload = event.payload as { message: number[] }
-      const [command, note, velocity] = payload.message
+      const [status, note, velocity] = payload.message
 
-      if (command === 144) {
+      const command = status & 0xf0
+
+      if (command === 0x90) {
         setChordStack?.((cs) => [...cs, note])
       }
 
-      if (command === 128 || velocity === 0) {
+      if (command === 0x80 || velocity === 0) {
         // remove midiNumber from chordStack
         setChordStack?.((cs) => {
           const removalIdx = cs.indexOf(note)
@@ -106,7 +108,7 @@ const Config = () => {
 
   return (
     <ConfigPage>
-      <ConfigHeader />
+      <Navbar />
     </ConfigPage>
   )
 }

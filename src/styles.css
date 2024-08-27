@@ -41,12 +41,9 @@
 }
 
 .logo {
-  height: 6em;
-  padding: 1em;
   will-change: filter;
   transition: 0.75s;
   font-family: "Deluge LED";
-  font-size: 1.5em;
 }
 
 .logo.tauri:hover {
