@@ -9,7 +9,7 @@ import {
   useState,
 } from 'react'
 import { useTranslation } from 'react-i18next'
-import { InstrumentName } from 'soundfont-player'
+// import { InstrumentName } from 'soundfont-player'
 import { Store } from 'tauri-plugin-store-api'
 import { AVAILABLE_SETTINGS, MidiDevice, PTSettingsKeyType } from '../../utils'
 import {
@@ -21,7 +21,7 @@ type KVContextType = {
   children?: React.ReactNode
 
   isLoading?: boolean
-  pianoSound?: InstrumentName
+  // pianoSound?: InstrumentName
   showKeyboard?: boolean
   muteSound?: boolean
   midiDevice?: MidiDevice
@@ -29,7 +29,7 @@ type KVContextType = {
   isSentryOn?: boolean
 
   setIsLoading?: Dispatch<SetStateAction<boolean>>
-  setPianoSound?: Dispatch<SetStateAction<InstrumentName>>
+  // setPianoSound?: Dispatch<SetStateAction<InstrumentName>>
   setShowKeyboard?: Dispatch<SetStateAction<boolean>>
   setMuteSound?: Dispatch<SetStateAction<boolean>>
   setMidiDevice?: Dispatch<SetStateAction<MidiDevice>>
@@ -48,9 +48,9 @@ export const KVContext = createContext({} as KVContextType)
 const KVProvider: FC<KVContextType> = ({ children }) => {
   const store = useMemo(() => new Store('.settings.dat'), [])
   const [isLoading, setIsLoading] = useState(true)
-  const [pianoSound, setPianoSound] = useState(
-    'acoustic_grand_piano' as InstrumentName
-  )
+  // const [pianoSound, setPianoSound] = useState(
+  //   'acoustic_grand_piano' as InstrumentName
+  // )
   const [showKeyboard, setShowKeyboard] = useState(true)
   const [muteSound, setMuteSound] = useState(false)
   const [midiDevice, setMidiDevice] = useState<MidiDevice>({
@@ -69,15 +69,15 @@ const KVProvider: FC<KVContextType> = ({ children }) => {
       return store.get(key).then((value) => {
         if (value === null) return
         switch (key) {
-          case 'piano-sound':
-            setPianoSound(value as InstrumentName)
-            break
+          // case 'piano-sound':
+          //   setPianoSound(value as InstrumentName)
+          //   break
           case 'show-keyboard':
             setShowKeyboard(Boolean(value))
             break
-          case 'mute-sound':
-            setMuteSound(Boolean(value))
-            break
+          // case 'mute-sound':
+          //   setMuteSound(Boolean(value))
+          //   break
           case 'midi-input-id':
             setMidiDevice({
               id: Number(value),
@@ -93,7 +93,7 @@ const KVProvider: FC<KVContextType> = ({ children }) => {
       })
     },
     [
-      setPianoSound,
+      // setPianoSound,
       setShowKeyboard,
       setMuteSound,
       setMidiDevice,
@@ -115,17 +115,17 @@ const KVProvider: FC<KVContextType> = ({ children }) => {
     [store, isLoading]
   )
 
-  useEffect(() => {
-    saveSetting('piano-sound', pianoSound)
-  }, [pianoSound, saveSetting])
+  // useEffect(() => {
+  //   saveSetting('piano-sound', pianoSound)
+  // }, [pianoSound, saveSetting])
 
   useEffect(() => {
     saveSetting('show-keyboard', showKeyboard)
   }, [showKeyboard, saveSetting])
 
-  useEffect(() => {
-    saveSetting('mute-sound', muteSound)
-  }, [muteSound, saveSetting])
+  // useEffect(() => {
+  //   saveSetting('mute-sound', muteSound)
+  // }, [muteSound, saveSetting])
 
   useEffect(() => {
     saveSetting('midi-input-id', midiDevice?.id || 0)
@@ -161,7 +161,7 @@ const KVProvider: FC<KVContextType> = ({ children }) => {
 
   const context: KVContextType = {
     isLoading,
-    pianoSound,
+    // pianoSound,
     showKeyboard,
     muteSound,
     midiDevice,
@@ -169,7 +169,7 @@ const KVProvider: FC<KVContextType> = ({ children }) => {
     isSentryOn,
 
     setIsLoading,
-    setPianoSound,
+    // setPianoSound,
     setShowKeyboard,
     setMuteSound,
     setMidiDevice,
