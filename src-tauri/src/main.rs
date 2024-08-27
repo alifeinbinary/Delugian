@@ -115,8 +115,12 @@ fn open_midi_connection(
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
+fn sysex_receive(sysex_receive_message: String) {
+    println!("SysEx message received: {}", sysex_receive_message);
+}
+#[tauri::command]
+fn sysex_send() -> String {
+    "SysEx message sent:".into()
 }
 
 fn main() {
@@ -125,7 +129,8 @@ fn main() {
             ..Default::default()
         })
         .invoke_handler(tauri::generate_handler![
-            greet,
+            sysex_receive,
+            sysex_send,
             open_midi_connection,
             list_midi_connections
         ])

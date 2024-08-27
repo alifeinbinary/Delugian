@@ -1,4 +1,4 @@
-import { invoke } from '@tauri-apps/api'
+import { invoke } from '@tauri-apps/api/tauri'
 import { useContext, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Select from 'react-select'
@@ -37,7 +37,7 @@ const SettingRow = ({ setting, value }: SettingRowProps) => {
     setMidiDevice: setConnectedMidiDevice,
     setLanguage,
     setIsSentryOn,
-    setPianoSound,
+    // setPianoSound,
   } = useContext(KVContext)
   const { t } = useTranslation()
 
@@ -94,6 +94,8 @@ const SettingRow = ({ setting, value }: SettingRowProps) => {
           }}
           className='text-black'
         />
+        <button onClick={() => { invoke('sysex_receive', { sysexReceiveMessage: 'tauri' }) }}>Send</button>
+        <button onClick={() => { invoke('sysex_send').then((message) => console.log(message)) }}>Receive</button>
       </SettingRowContainer>
     )
   } else if (setting.key === 'language') {
