@@ -1,4 +1,4 @@
-import { invoke } from '@tauri-apps/api'
+import { invoke } from '@tauri-apps/api/tauri'
 import { listen, UnlistenFn } from '@tauri-apps/api/event'
 import { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -27,7 +27,6 @@ const Keyboard = () => {
     setNoteTracker,
     chordStack,
     setChordStack,
-    scale,
   } = useContext(MainContext)
 
   const { showKeyboard, midiDevice, setMidiDevice } =
@@ -72,9 +71,11 @@ const Keyboard = () => {
 
     listen('midi_message', (event) => {
       const payload = event.payload as { message: number[] }
-      const [command, note, velocity] = payload.message
+      const [status, note, velocity] = payload.message
 
-      if (command === 144) {
+      const command = status & 0xf0
+
+      if (command === 0x90) {
         setActiveNotes((an) => ({
           ...an,
           [note]: true,
@@ -83,7 +84,7 @@ const Keyboard = () => {
 
       // some midi keyboards don't send the off signal,
       // they just set the velocity to 0
-      if (command === 128 || velocity === 0) {
+      if (command === 0x80 || velocity === 0) {
         setActiveNotes((an) => ({
           ...an,
           [note]: false,
@@ -112,45 +113,48 @@ const Keyboard = () => {
   }, [])
 
   return (
-    <KeyboardContainer hide={!showKeyboard}>
-    <Piano
-      noteRange={{ first: firstNote, last: lastNote }}
-      playNote={(midiNumber: number) => {
-        setChordStack?.((cs) => [...cs, midiNumber])
+    <KeyboardContainer hide={!showKeyboard ? true : false}>
+      <Piano
+        noteRange={{ first: firstNote, last: lastNote }}
+        playNote={(midiNumber: number) => {
+          setChordStack?.((cs) => [...cs, midiNumber])
 
-        // !muteSound && playNote(midiNumber)
-      }}
-      stopNote={(midiNumber: number) => {
-        // stopNote(midiNumber)
+          // !muteSound && playNote(midiNumber)
+        }}
+        stopNote={(midiNumber: number) => {
+          // stopNote(midiNumber)
 
-        // remove midiNumber from chordStack
-        setChordStack?.((cs) => {
-          const removalIdx = cs.indexOf(midiNumber)
-          if (removalIdx > -1) {
-            cs.splice(removalIdx, 1)
-          }
+          // remove midiNumber from chordStack
+          setChordStack?.((cs) => {
+            const removalIdx = cs.indexOf(midiNumber)
+            if (removalIdx > -1) {
+              cs.splice(removalIdx, 1)
+            }
 
-          return cs
-        })
-      }}
-      keyboardShortcuts={keyboardShortcuts}
-      renderNoteLabel={({ midiNumber }: { midiNumber: number }) => (
-        <p className='ReactPiano__NoteLabel'>
-          {/* {t(
-            swapNoteWithSynonym(
-              MidiNumbers.getAttributes(midiNumber).note.replace(
-                /[0-9]/,
-                ''
-              )
-            )
-          )} */}
-        </p>
-      )}
-      activeNotes={Object.keys(activeNotes)
-        .filter((v: string) => activeNotes[v])
-        .map((s: string) => Number(s))}
-    />
-  </KeyboardContainer>
+            return cs
+          })
+        }}
+        keyboardShortcuts={keyboardShortcuts}
+        // renderNoteLabel={({ midiNumber }: { midiNumber: number }) => (
+        //   <p className='ReactPiano__NoteLabel'>
+        //     {t(
+        //     swapNoteWithSynonym(
+        //       MidiNumbers.getAttributes(midiNumber).note.replace(
+        //         /[0-9]/,
+        //         ''
+        //       )
+        //     )
+        //   )}
+        //   </p>
+        // )}
+        activeNotes={Object.keys(activeNotes)
+          .filter((v: string) => activeNotes[v])
+          .map((s: string) => Number(s))}
+        onPlayNoteStart={(midiNumber: number) => {
+
+        }}
+      />
+    </KeyboardContainer>
   )
 }
 
