@@ -27,9 +27,9 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.tauri.dev",
+      "identifier": "com.delugian.dev",
       "targets": "all",
-      "category": "Music, Utility",
+      "category": "Music",
       "macOS": {
         "minimumSystemVersion": "10.11"
       }
