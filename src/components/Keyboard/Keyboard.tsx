@@ -113,7 +113,7 @@ const Keyboard = () => {
   }, [])
 
   return (
-    <KeyboardContainer hide={!showKeyboard ? true : false}>
+    <KeyboardContainer hide={showKeyboard ? false : true}>
       <Piano
         noteRange={{ first: firstNote, last: lastNote }}
         playNote={(midiNumber: number) => {
