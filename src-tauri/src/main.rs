@@ -1,7 +1,10 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use midir::{Ignore, MidiInput, MidiInputConnection, MidiOutput, MidiOutputConnection};
+use midir::{
+    Ignore, MidiInput, MidiInputConnection, MidiInputPort, MidiOutput, MidiOutputConnection,
+    MidiOutputPort,
+};
 use serde::Serialize;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
@@ -16,6 +19,39 @@ pub struct MidiState {
 #[derive(Clone, Serialize)]
 struct MidiMessage {
     message: Vec<u8>,
+}
+
+fn find_port_index<T, P>(midi_device: &T, ports: &Vec<P>, target_name: &str) -> Option<usize>
+where
+    T: MidiDevice<P>,
+    P: Clone,
+{
+    for (i, port) in ports.iter().enumerate() {
+        if midi_device.port_name(port).unwrap() == target_name {
+            println!("Found {} at index {}", target_name, i);
+            return Some(i);
+        }
+        println!("{}: {}", i, midi_device.port_name(port).unwrap());
+    }
+    None
+}
+
+trait MidiDevice<P> {
+    fn port_name(&self, port: &P) -> Result<String, midir::PortInfoError>;
+}
+
+// // Implement the trait for MidiInput
+impl MidiDevice<MidiInputPort> for MidiInput {
+    fn port_name(&self, port: &MidiInputPort) -> Result<String, midir::PortInfoError> {
+        MidiInput::port_name(self, port)
+    }
+}
+
+// // Implement the trait for MidiOutput
+impl MidiDevice<MidiOutputPort> for MidiOutput {
+    fn port_name(&self, port: &MidiOutputPort) -> Result<String, midir::PortInfoError> {
+        MidiOutput::port_name(self, port)
+    }
 }
 
 #[tauri::command]
@@ -54,7 +90,8 @@ fn open_midi_connection(
         Ok(mut midi_in) => {
             midi_in.ignore(Ignore::None);
             let midi_in_ports: Vec<midir::MidiInputPort> = midi_in.ports();
-            let port: Option<&midir::MidiInputPort> = midi_in_ports.get(input_idx);
+            let port: Option<&midir::MidiInputPort> = midi_in_ports
+                .get(find_port_index(&midi_in, &midi_in_ports, "Deluge Port 3").unwrap());
             match port {
                 Some(port) => {
                     let midi_in_conn: Result<
@@ -62,7 +99,7 @@ fn open_midi_connection(
                         midir::ConnectError<MidiInput>,
                     > = midi_in.connect(
                         port,
-                        "midir",
+                        "Delugian",
                         move |_, message: &[u8], _| {
                             handle
                                 .emit_all(
@@ -97,11 +134,12 @@ fn open_midi_connection(
     match midi_out {
         Ok(midi_out) => {
             let midi_out_ports: Vec<midir::MidiOutputPort> = midi_out.ports();
-            let port: Option<&midir::MidiOutputPort> = midi_out_ports.get(input_idx);
+            let port: Option<&midir::MidiOutputPort> = midi_out_ports
+                .get(find_port_index(&midi_out, &midi_out_ports, "Deluge Port 3").unwrap());
             match port {
                 Some(port) => {
                     let midi_out_conn: MidiOutputConnection =
-                        midi_out.connect(port, "midir").unwrap();
+                        midi_out.connect(port, "Delugian").unwrap();
                     midi_state.output.lock().unwrap().replace(midi_out_conn);
                 }
                 None => {
